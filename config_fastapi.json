@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "kode-testovoe"
+  },
+  "logging": {
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+      "default": {
+        "format": "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+      }
+    },
+    "handlers": {
+      "console": {
+        "class": "logging.StreamHandler",
+        "formatter": "default"
+      }
+    },
+    "root": {
+      "level": "INFO",
+      "handlers": ["console"]
+    }
+  },
+  "mongodb": {
+    "uri": "mongodb://mongo:27017",
+    "database": "aybolit",
+    "collection": "schedules"
+  },
+  "scheduler": {
+    "active_hours": {
+      "start": "08:00",
+      "end": "22:00"
+    },
+    "rounding_minutes": 15,
+    "next_period_hours": 1
+  }
+}

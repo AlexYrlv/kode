@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  title: Доктор Айболит — Напоминания о приёме лекарств
+  description: |
+    API для создания, получения и управления расписаниями приёма лекарств.
+    Приёмы происходят только с 8:00 до 22:00. Время округляется вверх до 15 минут.
+  version: '1.0.0'
+
+paths:
+  /v1/schedule:
+    post:
+      summary: Создание расписания
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreateRequest'
+      responses:
+        '200':
+          description: Расписание успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponse'
+
+    get:
+      summary: Получение конкретного расписания
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: schedule_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Расписание с приёмами на текущий день
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleWithTakings'
+
+  /v1/schedules:
+    get:
+      summary: Получение всех расписаний пользователя
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список всех расписаний
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScheduleResponse'
+
+  /v1/next_takings:
+    get:
+      summary: Получение ближайших приёмов
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список ближайших приёмов в следующем часе
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NextTaking'
+
+components:
+  schemas:
+    ScheduleCreateRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          example: 123
+        medicine_name:
+          type: string
+          example: "Таблетка от кашля"
+        periodicity:
+          type: number
+          format: float
+          example: 2.0
+        duration:
+          type: integer
+          nullable: true
+          example: 14
+
+    ScheduleResponse:
+      type: object
+      properties:
+        schedule_id:
+          type: string
+          example: "abc123"
+        user_id:
+          type: integer
+          example: 123
+        medicine_name:
+          type: string
+          example: "Таблетка от кашля"
+        periodicity:
+          type: number
+          example: 2.0
+        start_date:
+          type: string
+          format: date
+          example: "2025-03-23"
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2025-04-05"
+
+    ScheduleWithTakings:
+      allOf:
+        - $ref: '#/components/schemas/ScheduleResponse'
+        - type: object
+          properties:
+            takings:
+              type: array
+              items:
+                type: string
+                example: "08:00"
+
+    NextTaking:
+      type: object
+      properties:
+        schedule_id:
+          type: string
+          example: "abc123"
+        medicine_name:
+          type: string
+          example: "Витаминки"
+        taking_time:
+          type: string
+          example: "14:15"
